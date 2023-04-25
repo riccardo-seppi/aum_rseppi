@@ -16,20 +16,20 @@ hod::hod(cosmo p, hodpars h)
 :cosmology(p)
 {
     initialize_const();
-    hodp=h; 
+    hodp=h;
     if(verbose){
         std::cout<<"# HOD inited to: "<<"\n"
             <<"# Mmin "<<hodp.Mmin<<"\n" \
             <<"# siglogM "<<hodp.siglogM<<"\n" \
-            <<"# Msat "<<hodp.Msat<<"\n" \
-            <<"# alpsat "<<hodp.alpsat<<"\n" \
-            <<"# Mcut "<<hodp.Mcut<<"\n" \
+            /*<<"# Msat "<<hodp.Msat<<"\n" \
+            //<<"# alpsat "<<hodp.alpsat<<"\n" \
+            //<<"# Mcut "<<hodp.Mcut<<"\n" \*/
             <<"# fac "<<hodp.fac<<"\n" \
             <<"# csbycdm "<<hodp.csbycdm \
             <<std::endl;
     }
     halo_exc=true;
-    whichopt=0;
+    whichopt=4;
     //std::cerr<<"HOD constructor initialized"<<std::endl;
     //exit(101);
     bool_init_D2gg=false;
@@ -56,24 +56,24 @@ hod::hod()
     initialize_const();
     hodp.Mmin=13.0;
     hodp.siglogM=0.25;
-    hodp.Msat=14.0;
-    hodp.alpsat=1.0;
-    hodp.Mcut=13.5;
+    //hodp.Msat=14.0;
+    //hodp.alpsat=1.0;
+    //hodp.Mcut=13.5;
     hodp.csbycdm=1.0;
     hodp.fac=1.0;
     if(verbose){
         std::cout<<"# HOD inited to: "<<"\n"
             <<"# Mmin "<<hodp.Mmin<<"\n" \
             <<"# siglogM "<<hodp.siglogM<<"\n" \
-            <<"# Msat "<<hodp.Msat<<"\n" \
-            <<"# alpsat "<<hodp.alpsat<<"\n" \
-            <<"# Mcut "<<hodp.Mcut<<"\n" \
+            /*<<"# Msat "<<hodp.Msat<<"\n" \
+            //<<"# alpsat "<<hodp.alpsat<<"\n" \
+            //<<"# Mcut "<<hodp.Mcut<<"\n" \*/
             <<"# fac "<<hodp.fac<<"\n" \
             <<"# csbycdm "<<hodp.csbycdm \
             <<std::endl;
     }
     halo_exc=true;
-    whichopt=0;
+    whichopt=4;
 
     bool_init_D2gg=false;
     bool_init_D2gd=false;
@@ -102,7 +102,7 @@ void hod::setMiyatake21_switch(bool mark){
 }
 
 #if TINK==1
-///And now all the different functions 
+///And now all the different functions
 ///Average number of central galaxies in a halo of mass m
 double hod::ncen(double xm)
 {
@@ -112,15 +112,15 @@ double hod::ncen(double xm)
 }
 
 ///Average number of satellite galaxies in a halo of mass m
-double hod::nsat(double xm)
-{
-    double arg=(xm-hodp.Mmin)/hodp.siglogM;
-    double res=0.5*(1+gsl_sf_erf(arg));
-    res=res*pow(10.,hodp.alpsat*(xm-hodp.Msat))*exp(-pow(10.,hodp.Mcut-xm));
-    return res;
+//double hod::nsat(double xm)
+//{
+//    double arg=(xm-hodp.Mmin)/hodp.siglogM;
+//    double res=0.5*(1+gsl_sf_erf(arg));
+//    res=res*pow(10.,hodp.alpsat*(xm-hodp.Msat))*exp(-pow(10.,hodp.Mcut-xm));
+//    return res;
 }
 #elif TINK==2
-///And now all the different functions 
+///And now all the different functions
 ///Average number of central galaxies in a halo of mass m
 double hod::ncen(double xm)
 {
@@ -138,19 +138,19 @@ double hod::ncen(double xm)
 }
 
 ///Average number of satellite galaxies in a halo of mass m
-double hod::nsat(double xm)
-{
-    if(!bool_init_ns){
-        std::cout<<"Spline for Ns not initialized\n";
-    }
-    double res=0.0;
-    if(xm<ns_mmin || xm>ns_mmax){
-        res=0.0;
-    }else{
-        res=pow(10.,gsl_spline_eval(ns_spline,xm,ns_acc));
-    }
-    return res;
-}
+//double hod::nsat(double xm)
+//{
+//    if(!bool_init_ns){
+//        std::cout<<"Spline for Ns not initialized\n";
+//    }
+//    double res=0.0;
+//    if(xm<ns_mmin || xm>ns_mmax){
+//        res=0.0;
+//    }else{
+//        res=pow(10.,gsl_spline_eval(ns_spline,xm,ns_acc));
+//    }
+//    return res;
+//}
 
 void hod::init_Nc_spl(double xx[],double yy[],int Ncspl){
     if(!bool_init_nc){
@@ -166,19 +166,19 @@ void hod::init_Nc_spl(double xx[],double yy[],int Ncspl){
     nc_mmax=xx[Ncspl-1];
 }
 
-void hod::init_Ns_spl(double xx[],double yy[],int Nsspl){
-    if(!bool_init_ns){
-        gsl_interp_accel_free(ns_acc);
-        gsl_spline_free(ns_spline);
-        bool_init_ns=false;
-    }
-    ns_acc=gsl_interp_accel_alloc();
-    ns_spline=gsl_spline_alloc(gsl_interp_cspline,Nsspl);
-    gsl_spline_init(ns_spline,xx,yy,Nsspl);
-    bool_init_ns=true;
-    ns_mmin=xx[0];
-    ns_mmax=xx[Nsspl-1];
-}
+//void hod::init_Ns_spl(double xx[],double yy[],int Nsspl){
+//    if(!bool_init_ns){
+//        gsl_interp_accel_free(ns_acc);
+//        gsl_spline_free(ns_spline);
+//        bool_init_ns=false;
+//    }
+//    ns_acc=gsl_interp_accel_alloc();
+//    ns_spline=gsl_spline_alloc(gsl_interp_cspline,Nsspl);
+//    gsl_spline_init(ns_spline,xx,yy,Nsspl);
+//    bool_init_ns=true;
+//    ns_mmin=xx[0];
+//    ns_mmax=xx[Nsspl-1];
+//}
 #elif TINK==3
 // This uses a modified prescription of Martin White's 2012 model
 // White -> This model
@@ -187,7 +187,7 @@ void hod::init_Ns_spl(double xx[],double yy[],int Nsspl){
 // M1 -> Msat
 // alp -> alpsat
 // fac -> central occupation maximum
-///And now all the different functions 
+///And now all the different functions
 ///Average number of central galaxies in a halo of mass m
 double hod::ncen(double xm)
 {
@@ -197,15 +197,15 @@ double hod::ncen(double xm)
 }
 
 ///Average number of satellite galaxies in a halo of mass m
-double hod::nsat(double xm)
-{
-    if(xm<hodp.Mcut){
-        return 0;
-    }else{
-        double res=pow(pow(10.,xm-hodp.Msat)-pow(10.,hodp.Mcut-hodp.Msat),hodp.alpsat);
-        return res;
-    }
-}
+//double hod::nsat(double xm)
+//{
+//    if(xm<hodp.Mcut){
+//        return 0;
+//    }else{
+//        double res=pow(pow(10.,xm-hodp.Msat)-pow(10.,hodp.Mcut-hodp.Msat),hodp.alpsat);
+//        return res;
+//    }
+//}
 #elif TINK==4
 // This uses a modified prescription of Martin White's 2012 model
 // White -> This model
@@ -214,7 +214,7 @@ double hod::nsat(double xm)
 // M1 -> Msat
 // alp -> alpsat
 // fac -> central occupation maximum at Mmin
-///And now all the different functions 
+///And now all the different functions
 ///Average number of central galaxies in a halo of mass m
 double hod::ncen(double xm)
 {
@@ -228,19 +228,19 @@ double hod::ncen(double xm)
 }
 
 ///Average number of satellite galaxies in a halo of mass m
-double hod::nsat(double xm)
-{
-    double res=pow(pow(10.,xm-hodp.Msat),hodp.alpsat);
-    return res;
-}
-#else
+//double hod::nsat(double xm)
+//{
+//    double res=pow(pow(10.,xm-hodp.Msat),hodp.alpsat);
+//    return res;
+//}
+//#else
 // This can use the Martin White prescription from White et al. 2012
 // White -> This model
 // Mcut -> Mmin
 // kMcut -> Mcut
 // M1 -> Msat
 // alp -> alpsat
-///And now all the different functions 
+///And now all the different functions
 ///Average number of central galaxies in a halo of mass m
 double hod::ncen(double xm)
 {
@@ -256,38 +256,38 @@ double hod::ncen(double xm)
 }
 
 ///Average number of satellite galaxies in a halo of mass m
-double hod::nsat(double xm)
-{
-    //if(xm<hodp.Mcut||xm<hodp.Mmin){
-    if(xm<hodp.Mcut){
-        return 0;
-    }else{
-        double arg=(xm-hodp.Mmin)/hodp.siglogM;
-        double res=0.5*(1+gsl_sf_erf(arg));
-        double inc=1.0;
-        if(xm<inc_xM){
-            inc=1.0+inc_alp*(xm-inc_xM);
-            if(inc>1.0)inc=1.0; // Guarantees the code works even if inc_alp is negative, effectively ignoring inc_alp in that case
-        }
-        res=res*inc;
-        res=res*pow(pow(10.,xm-hodp.Msat)-pow(10.,hodp.Mcut-hodp.Msat),hodp.alpsat);
-        return res;
-    }
-}
+//double hod::nsat(double xm)
+//{
+//    //if(xm<hodp.Mcut||xm<hodp.Mmin){
+//    if(xm<hodp.Mcut){
+//        return 0;
+//    }else{
+//        double arg=(xm-hodp.Mmin)/hodp.siglogM;
+//        double res=0.5*(1+gsl_sf_erf(arg));
+//        double inc=1.0;
+//        if(xm<inc_xM){
+//            inc=1.0+inc_alp*(xm-inc_xM);
+//            if(inc>1.0)inc=1.0; // Guarantees the code works even if inc_alp is negative, effectively ignoring inc_alp in that case
+//        }
+//        res=res*inc;
+//        res=res*pow(pow(10.,xm-hodp.Msat)-pow(10.,hodp.Mcut-hodp.Msat),hodp.alpsat);
+//        return res;
+//    }
+//}
 #endif
 
-///Average number of satellite galaxies 
-double hod::nsatz(double z)
-{
-
-    double result=0.0;
-    for(int i=0;i<N9_16;i++)
-    {
-        double m=pow(10.,x9_16[i]);
-        result=result+log(10.0)*nsat(x9_16[i])*m*nofm(m,z)*w9_16[i];
-    }
-    return result;
-}
+///Average number of satellite galaxies
+//double hod::nsatz(double z)
+//{
+//
+//    double result=0.0;
+//    for(int i=0;i<N9_16;i++)
+//    {
+//        double m=pow(10.,x9_16[i]);
+//        result=result+log(10.0)*nsat(x9_16[i])*m*nofm(m,z)*w9_16[i];
+//    }
+//    return result;
+//}
 
 ///Average number of central galaxies at redshift z
 double hod::ncenz(double z)
@@ -380,22 +380,24 @@ double hod::galaxy_bias(double z)
 {
     double btot=0.0;
     double totNc=0.0;
-    double totNs=0.0;
+    //double totNs=0.0;
     for(int i=0;i<N9_16;i++)
     {
         // Numerator HOD factors
         double mass=pow(10.,x9_16[i]);
         double avNcen=ncen(x9_16[i]);
-        double avNsat=nsat(x9_16[i]);
+        //double avNsat=nsat(x9_16[i]);
         double nofmdm=nofm(mass,z)*w9_16[i]*mass*log(10.0);
         double bmnmdm=bias(mass,z)*nofm(mass,z)*w9_16[i]*mass*log(10.0);
 
         totNc=totNc+avNcen*nofmdm;
-        totNs=totNs+avNsat*nofmdm;
-        btot=btot+(avNcen+avNsat)*bmnmdm;
+        //totNs=totNs+avNsat*nofmdm;
+        //btot=btot+(avNcen+avNsat)*bmnmdm;
+        btot=btot+(avNcen)*bmnmdm;//rseppi
 
     }
-    btot=btot/(totNc+totNs);
+    //btot=btot/(totNc+totNs);
+    btot=btot/(totNc);
     return btot;
 }
 
@@ -413,30 +415,33 @@ double hod::Pk_gg_gd_he(double z)
     double xx[kbins],yy[kbins],zz[kbins];
     double hod_kdiff=(hod_kmax-hod_kmin)/(kbins-1.);
 
-    // First the various denominators. 
+    // First the various denominators.
     //  The rho is in comoving units, so no z dependence.
     double rho_aver=Omega0*rho_crit_0;
 
     // Set up the mass dependent factors in the integral
-    double mdep_1hcs[N9_16],mdep_1hss[N9_16],mdep_1hcd[N9_16],mdep_1hsd[N9_16];
+    //double mdep_1hcs[N9_16],mdep_1hss[N9_16],mdep_1hcd[N9_16],mdep_1hsd[N9_16];
+    double mdep_1hcd[N9_16];//rseppi
     double rvir[N9_16],mvir[N9_16],cvir[N9_16];
     double r200[N9_16],m200[N9_16],c200[N9_16];
     double fofM[N9_16];
 
-    double mdep_2hs_1[N9_16],mdep_2hd_1[N9_16],mdep_2hc_1[N9_16];
-    double mdep_2hs_2[N9_16],mdep_2hd_2[N9_16],mdep_2hc_2[N9_16];
+    //double mdep_2hs_1[N9_16],mdep_2hd_1[N9_16],mdep_2hc_1[N9_16];
+    //double mdep_2hs_2[N9_16],mdep_2hd_2[N9_16],mdep_2hc_2[N9_16];
+    double mdep_2hd_1[N9_16],mdep_2hc_1[N9_16];//rseppi
+    double mdep_2hd_2[N9_16],mdep_2hc_2[N9_16];//rseppi
     double mdep_2h_bcorr=0.0;
     double mdep_2h_mcorr=0.0;
 
     double totNc=0.0;
-    double totNs=0.0;
+    //double totNs=0.0;
     double btot=0.0;
     for(int i=0;i<N9_16;i++)
     {
         // Numerator HOD factors
         double mass=pow(10.,x9_16[i]);
         double avNcen=ncen(x9_16[i]);
-        double avNsat=nsat(x9_16[i]);
+        //double avNsat=nsat(x9_16[i]);
         double nofmdm=nofm(mass,z)*w9_16[i]*mass*log(10.0);
         double bmnmdm=bias(mass,z)*nofm(mass,z)*w9_16[i]*mass*log(10.0);
 
@@ -444,17 +449,17 @@ double hod::Pk_gg_gd_he(double z)
         modelNFWhalo_com(mass, z, mvir[i], rvir[i], cvir[i], r200[i],c200[i]);
 
         // 1 halo M dependent terms that need a kterm multiplication
-        mdep_1hcs[i]=avNcen*avNsat*nofmdm;
-        mdep_1hss[i]=avNsat*avNsat*nofmdm;
+        //mdep_1hcs[i]=avNcen*avNsat*nofmdm;
+        //mdep_1hss[i]=avNsat*avNsat*nofmdm;
         mdep_1hcd[i]=avNcen* mass *nofmdm/rho_aver;
-        mdep_1hsd[i]=avNsat* mass *nofmdm/rho_aver;
+        //mdep_1hsd[i]=avNsat* mass *nofmdm/rho_aver;
 
         mdep_2hc_1[i] =avNcen*nofmdm;
-        mdep_2hs_1[i] =avNsat*nofmdm;
+        //mdep_2hs_1[i] =avNsat*nofmdm;
         mdep_2hd_1[i] = mass *nofmdm/rho_aver;
 
         mdep_2hc_2[i] =avNcen*bmnmdm;
-        mdep_2hs_2[i] =avNsat*bmnmdm;
+        //mdep_2hs_2[i] =avNsat*bmnmdm;
         mdep_2hd_2[i] = mass *bmnmdm/rho_aver;
 
         /// 2 halo integral correction items
@@ -462,8 +467,9 @@ double hod::Pk_gg_gd_he(double z)
         mdep_2h_mcorr=mdep_2h_mcorr+mass*nofmdm/rho_aver;
 
         totNc=totNc+mdep_2hc_1[i];
-        totNs=totNs+mdep_2hs_1[i];
-        btot=btot+(avNcen+avNsat)*bmnmdm;
+        //totNs=totNs+mdep_2hs_1[i];
+        //btot=btot+(avNcen+avNsat)*bmnmdm;
+        btot=btot+(avNcen)*bmnmdm;//rseppi
         //printf("DEBUG: %e %e %e %e \n",totNc,totNs,avNcen,nofmdm);
 
         if(fgm_m0>0.0){
@@ -487,30 +493,33 @@ double hod::Pk_gg_gd_he(double z)
             //printf("# I am assuming no correction due to low mass haloes as f(M) slope is greater than zero\n");
         }
     }
-    btot=btot/(totNc+totNs);
+    //btot=btot/(totNc+totNs);
+    btot=btot/(totNc);//rseppi
 
     /// Set the Kaiser factor
     fKaiser=-dlnDdln1pz(z);
     fKaiser=fKaiser/btot;
 
     // Central satellite fractions
-    double fcen=totNc/(totNc+totNs);
-    double fsat=1.-fcen;
+    //double fcen=totNc/(totNc+totNs);
+    //double fsat=1.-fcen;
+    double fcen=1.0;//rseppi
     if(fcen>1.0){
-        printf("Error in fcen: %e %e %e %e\n",fcen,fsat,totNc,totNs);
+        //printf("Error in fcen: %e %e %e %e\n",fcen,fsat,totNc,totNs);
+        printf("Error in fcen: %e %e\n",fcen,totNc);
         exit(101);
     }
 
     for(int i=0;i<N9_16;i++)
     {
-        mdep_1hcs[i]= mdep_1hcs[i]/totNc/totNs;
-        mdep_1hss[i]= mdep_1hss[i]/totNs/totNs;
+        //mdep_1hcs[i]= mdep_1hcs[i]/totNc/totNs;
+        //mdep_1hss[i]= mdep_1hss[i]/totNs/totNs;
         mdep_1hcd[i]= mdep_1hcd[i]/totNc;
-        mdep_1hsd[i]= mdep_1hsd[i]/totNs;
+        //mdep_1hsd[i]= mdep_1hsd[i]/totNs;
         mdep_2hc_1[i]=mdep_2hc_1[i]/totNc;
-        mdep_2hs_1[i]=mdep_2hs_1[i]/totNs;
+        //mdep_2hs_1[i]=mdep_2hs_1[i]/totNs;
         mdep_2hc_2[i]=mdep_2hc_2[i]/totNc;
-        mdep_2hs_2[i]=mdep_2hs_2[i]/totNs;
+        //mdep_2hs_2[i]=mdep_2hs_2[i]/totNs;
     }
     //exit(101);
 
@@ -528,9 +537,12 @@ double hod::Pk_gg_gd_he(double z)
         karr[kk]=pow(10.,karr[kk]);
 
         /// 1 halo terms, single integration
-        double int_1hcs,int_1hss,int_1hcd,int_1hsd;
-        int_1hcs=int_1hss=int_1hcd=int_1hsd=0.0;
-        double uk_s[N9_16],uk_d[N9_16];
+        //double int_1hcs,int_1hss,int_1hcd,int_1hsd;
+        double int_1hcd;
+        //int_1hcs=int_1hss=int_1hcd=int_1hsd=0.0;
+        int_1hcd=0.0;//rseppi
+        //double uk_s[N9_16],uk_d[N9_16];
+        double uk_d[N9_16];//rseppi
         double uk_cen[N9_16];
         for(int i=0;i<N9_16;i++)
         {
@@ -553,10 +565,10 @@ double hod::Pk_gg_gd_he(double z)
             //printf("DEBUG: %e %e %e \n",karr[k]*r200[i]/c200[i], c200[i],uk_d[i]);
 
             if(hodp.csbycdm==1.0){
-                uk_s[i]=uk_d[i];
+                //uk_s[i]=uk_d[i];
             }else{
                 //printf("DEBUG: I should not be here, %e \n",hodp.csbycdm);
-                uk_s[i]=ukinterp(karr[kk]*r200[i]/(c200[i]*hodp.csbycdm),hodp.csbycdm*c200[i]);
+                //uk_s[i]=ukinterp(karr[kk]*r200[i]/(c200[i]*hodp.csbycdm),hodp.csbycdm*c200[i]);
             }
 
             //double rfac=0.080*pow(10.,1./3.*(x9_16[i]-12.0))/r200[i];
@@ -571,27 +583,30 @@ double hod::Pk_gg_gd_he(double z)
             if (miyatake21switch){
                 double avNcen = ncen(x9_16[i]);
                 if (avNcen>0){
-		    int_1hcs+=mdep_1hcs[i]*uk_s[i]*uk_cen[i]/ncen(x9_16[i]); /// --> Change here Divide by ncen(M)
-		    int_1hss+=mdep_1hss[i]*pow(uk_s[i],2.)/ncen(x9_16[i]);  /// --> Change here Divide by ncen(M)
+		    //int_1hcs+=mdep_1hcs[i]*uk_s[i]*uk_cen[i]/ncen(x9_16[i]); /// --> Change here Divide by ncen(M)
+		    //int_1hss+=mdep_1hss[i]*pow(uk_s[i],2.)/ncen(x9_16[i]);  /// --> Change here Divide by ncen(M)
                 }
             }else{
-		int_1hcs+=mdep_1hcs[i]*uk_s[i]*uk_cen[i];
-		int_1hss+=mdep_1hss[i]*pow(uk_s[i],2.);  
+		//int_1hcs+=mdep_1hcs[i]*uk_s[i]*uk_cen[i];
+		//int_1hss+=mdep_1hss[i]*pow(uk_s[i],2.);
             }
             if(fgm_m0<0.0){
                 int_1hcd+=mdep_1hcd[i]*uk_d[i]*uk_cen[i];
-                int_1hsd+=mdep_1hsd[i]*uk_s[i]*uk_d[i];
+                //int_1hsd+=mdep_1hsd[i]*uk_s[i]*uk_d[i];
             }else{
                 int_1hcd+=mdep_1hcd[i]*uk_d[i]*fofM[i]*uk_cen[i];
-                int_1hsd+=mdep_1hsd[i]*uk_s[i]*uk_d[i]*fofM[i];
+                //int_1hsd+=mdep_1hsd[i]*uk_s[i]*uk_d[i]*fofM[i];
             }
 
         }
 
         /// 2 halo terms, double integration
-        double int_2hcs,int_2hss,int_2hcc;
-        double int_2hcd,int_2hsd;
-        int_2hcc=int_2hcs=int_2hss=int_2hcd=int_2hsd=0.0;
+        //double int_2hcs,int_2hss,int_2hcc;
+        //double int_2hcd,int_2hsd;
+        //int_2hcc=int_2hcs=int_2hss=int_2hcd=int_2hsd=0.0;
+        double int_2hcc;//rs
+        double int_2hcd;//rs
+        int_2hcc=int_2hcd=0.0;//rs
         for(int i=0;i<N9_16;i++)
         {
             for(int j=0;j<N9_16;j++)
@@ -601,11 +616,11 @@ double hod::Pk_gg_gd_he(double z)
                 int_2hcc +=(mdep_2hc_1[i]*mdep_2hc_1[j]*uk_cen[i]*uk_cen[j]*Qk1[(k*N9_16+i)*N9_16+j]);
                 int_2hcc +=(mdep_2hc_2[i]*mdep_2hc_2[j]*uk_cen[i]*uk_cen[j]*Qk2[(k*N9_16+i)*N9_16+j]);
 
-                int_2hcs +=(mdep_2hc_1[i]*mdep_2hs_1[j]*uk_cen[i]*uk_s[j]*Qk1[(k*N9_16+i)*N9_16+j]);
-                int_2hcs +=(mdep_2hc_2[i]*mdep_2hs_2[j]*uk_cen[i]*uk_s[j]*Qk2[(k*N9_16+i)*N9_16+j]);
+                //int_2hcs +=(mdep_2hc_1[i]*mdep_2hs_1[j]*uk_cen[i]*uk_s[j]*Qk1[(k*N9_16+i)*N9_16+j]);
+                //int_2hcs +=(mdep_2hc_2[i]*mdep_2hs_2[j]*uk_cen[i]*uk_s[j]*Qk2[(k*N9_16+i)*N9_16+j]);
 
-                int_2hss +=(mdep_2hs_1[i]*uk_s[i]*mdep_2hs_1[j]*uk_s[j]*Qk1[(k*N9_16+i)*N9_16+j]);
-                int_2hss +=(mdep_2hs_2[i]*uk_s[i]*mdep_2hs_2[j]*uk_s[j]*Qk2[(k*N9_16+i)*N9_16+j]);
+                //int_2hss +=(mdep_2hs_1[i]*uk_s[i]*mdep_2hs_1[j]*uk_s[j]*Qk1[(k*N9_16+i)*N9_16+j]);
+                //int_2hss +=(mdep_2hs_2[i]*uk_s[i]*mdep_2hs_2[j]*uk_s[j]*Qk2[(k*N9_16+i)*N9_16+j]);
 
                 // Now the double integrals for gd, assuming that both the Qk
                 // factors have been initialized
@@ -613,14 +628,14 @@ double hod::Pk_gg_gd_he(double z)
                     int_2hcd +=(mdep_2hc_1[i]*mdep_2hd_1[j]*uk_cen[i]*uk_d[j]*Qk1[(k*N9_16+i)*N9_16+j]);
                     int_2hcd +=(mdep_2hc_2[i]*mdep_2hd_2[j]*uk_cen[i]*uk_d[j]*Qk2[(k*N9_16+i)*N9_16+j]);
 
-                    int_2hsd +=(mdep_2hs_1[i]*uk_s[i]*mdep_2hd_1[j]*uk_d[j]*Qk1[(k*N9_16+i)*N9_16+j]);
-                    int_2hsd +=(mdep_2hs_2[i]*uk_s[i]*mdep_2hd_2[j]*uk_d[j]*Qk2[(k*N9_16+i)*N9_16+j]);
+                    //int_2hsd +=(mdep_2hs_1[i]*uk_s[i]*mdep_2hd_1[j]*uk_d[j]*Qk1[(k*N9_16+i)*N9_16+j]);
+                    //int_2hsd +=(mdep_2hs_2[i]*uk_s[i]*mdep_2hd_2[j]*uk_d[j]*Qk2[(k*N9_16+i)*N9_16+j]);
                 }else{
                     int_2hcd +=(mdep_2hc_1[i]*mdep_2hd_1[j]*uk_cen[i]*uk_d[j]*Qk1[(k*N9_16+i)*N9_16+j])*fofM[i];
                     int_2hcd +=(mdep_2hc_2[i]*mdep_2hd_2[j]*uk_cen[i]*uk_d[j]*Qk2[(k*N9_16+i)*N9_16+j])*fofM[i];
 
-                    int_2hsd +=(mdep_2hs_1[i]*uk_s[i]*mdep_2hd_1[j]*uk_d[j]*Qk1[(k*N9_16+i)*N9_16+j])*fofM[i];
-                    int_2hsd +=(mdep_2hs_2[i]*uk_s[i]*mdep_2hd_2[j]*uk_d[j]*Qk2[(k*N9_16+i)*N9_16+j])*fofM[i];
+                    //int_2hsd +=(mdep_2hs_1[i]*uk_s[i]*mdep_2hd_1[j]*uk_d[j]*Qk1[(k*N9_16+i)*N9_16+j])*fofM[i];
+                    //int_2hsd +=(mdep_2hs_2[i]*uk_s[i]*mdep_2hd_2[j]*uk_d[j]*Qk2[(k*N9_16+i)*N9_16+j])*fofM[i];
                 }
 
             }
@@ -628,8 +643,8 @@ double hod::Pk_gg_gd_he(double z)
             /// Correction for the finite range of integration
             int_2hcd +=(mdep_2hc_1[i]*uk_cen[i]*Qk1[(k*N9_16+i)*N9_16+i]*mdep_2h_mcorr);
             int_2hcd +=(mdep_2hc_2[i]*uk_cen[i]*Qk2[(k*N9_16+i)*N9_16+i]*mdep_2h_bcorr);
-            int_2hsd +=(mdep_2hs_1[i]*uk_s[i]*Qk1[(k*N9_16+i)*N9_16+i]*mdep_2h_mcorr);
-            int_2hsd +=(mdep_2hs_2[i]*uk_s[i]*Qk2[(k*N9_16+i)*N9_16+i]*mdep_2h_bcorr);
+            //int_2hsd +=(mdep_2hs_1[i]*uk_s[i]*Qk1[(k*N9_16+i)*N9_16+i]*mdep_2h_mcorr);
+            //int_2hsd +=(mdep_2hs_2[i]*uk_s[i]*Qk2[(k*N9_16+i)*N9_16+i]*mdep_2h_bcorr);
 
         }
 
@@ -639,53 +654,62 @@ double hod::Pk_gg_gd_he(double z)
 
         //printf("k: %e 1hcd: %e 1hsd: %e \n",karr[kk],int_1hcd,int_1hsd);
 
-        double P_gg_1hcs=int_1hcs;
-        double P_gg_1hss=int_1hss;
+        //double P_gg_1hcs=int_1hcs;
+        //double P_gg_1hss=int_1hss;
         double P_gg_2hcc=int_2hcc;
-        double P_gg_2hcs=int_2hcs;
-        double P_gg_2hss=int_2hss;
+        //double P_gg_2hcs=int_2hcs;
+        //double P_gg_2hss=int_2hss;
 
         double P_gd_1hc =int_1hcd;
-        double P_gd_1hs =int_1hsd;
-        double P_gd_2hc =int_2hcd; 
-        double P_gd_2hs =int_2hsd; 
+        //double P_gd_1hs =int_1hsd;
+        double P_gd_2hc =int_2hcd;
+        //double P_gd_2hs =int_2hsd;
 
         /// Everything below here stays the same!!!
         // Total gg and gd power spectra
         //std::cout<<whichopt<<" whichopt is";
-        if(whichopt==0){
-            Pk_gg[kk]=2.0*fcen*fsat*P_gg_1hcs+fsat*fsat*P_gg_1hss+fcen*fcen*P_gg_2hcc+2.0*fcen*fsat*P_gg_2hcs+fsat*fsat*P_gg_2hss;
-            //fprintf(stderr, "%le %le %le %le %le %le %le %le\n", karr[kk], fcen, fsat, P_gg_1hcs, P_gg_1hss, P_gg_2hcc, P_gg_2hcs, P_gg_2hss);
-        }else{
-            Pk_gg[kk]=0.0;
-            if(whichopt==1){
-                Pk_gg[kk]=2.0*fcen*fsat*P_gg_1hcs;
-                //Pk_gg[kk]=fcen*fcen*P_gg_2hcc;
-            }else if(whichopt==2){
-                Pk_gg[kk]=fsat*fsat*P_gg_1hss;
-                //Pk_gg[kk]=2.0*fcen*fsat*P_gg_2hcs;
-            }else if(whichopt==3){
-                Pk_gg[kk]=fcen*fcen*P_gg_2hcc+2.0*fcen*fsat*P_gg_2hcs+fsat*fsat*P_gg_2hss;
-                //Pk_gg[kk]=fsat*fsat*P_gg_2hss;
-            }
-        }
+        //if(whichopt==0){
+        //    Pk_gg[kk]=2.0*fcen*fsat*P_gg_1hcs+fsat*fsat*P_gg_1hss+fcen*fcen*P_gg_2hcc+2.0*fcen*fsat*P_gg_2hcs+fsat*fsat*P_gg_2hss;
+        //    //fprintf(stderr, "%le %le %le %le %le %le %le %le\n", karr[kk], fcen, fsat, P_gg_1hcs, P_gg_1hss, P_gg_2hcc, P_gg_2hcs, P_gg_2hss);
+        //}else{
+        //    Pk_gg[kk]=0.0;
+        //    if(whichopt==1){
+        //        Pk_gg[kk]=2.0*fcen*fsat*P_gg_1hcs;
+        //        //Pk_gg[kk]=fcen*fcen*P_gg_2hcc;
+        //    }else if(whichopt==2){
+        //        Pk_gg[kk]=fsat*fsat*P_gg_1hss;
+        //        //Pk_gg[kk]=2.0*fcen*fsat*P_gg_2hcs;
+        //    }else if(whichopt==3){
+        //        Pk_gg[kk]=fcen*fcen*P_gg_2hcc+2.0*fcen*fsat*P_gg_2hcs+fsat*fsat*P_gg_2hss;
+        //        //Pk_gg[kk]=fsat*fsat*P_gg_2hss;
+        //    }else if (whichopt==4){
+        //        //modified by rseppi
+        //        Pk_gg[kk] = P_gg_2hcc;
+        //    }
+        //}
+        Pk_gg[kk] = P_gg_2hcc;
 
-        if(whichopt==0){
-            Pk_gd[kk]=fcen*P_gd_1hc+fsat*P_gd_1hs+fcen*P_gd_2hc+fsat*P_gd_2hs;
-        }else{
-            Pk_gd[kk]=0.0;
-            if(whichopt==1){
-                Pk_gd[kk]=fcen*P_gd_1hc;
-            }else if(whichopt==2){
-                Pk_gd[kk]=fsat*P_gd_1hs;
-            }else if(whichopt==3){
-                Pk_gd[kk]=fcen*P_gd_2hc+fsat*P_gd_2hs;
-            }
-        }
+        //if(whichopt==0){
+        //    Pk_gd[kk]=fcen*P_gd_1hc+fsat*P_gd_1hs+fcen*P_gd_2hc+fsat*P_gd_2hs;
+        //}else{
+        //    Pk_gd[kk]=0.0;
+        //    if(whichopt==1){
+        //        Pk_gd[kk]=fcen*P_gd_1hc;
+        //    }else if(whichopt==2){
+        //        Pk_gd[kk]=fsat*P_gd_1hs;
+        //    }else if(whichopt==3){
+        //        Pk_gd[kk]=fcen*P_gd_2hc+fsat*P_gd_2hs;
+        //    }else if(whichopt==4){
+        //        //modified by rseppi
+        //        Pk_gd[kk]=P_gd_1hc+P_gd_2hc;
+        //    }
+        //}
+        Pk_gd[kk]=P_gd_1hc+P_gd_2hc;
 
         if(Pk_gg[kk]<=0||Pk_gd[kk]<=0){
             std::cout<<"# Power spectra negative, will skip this k-point in the interpolation "<<std::endl;
-            printf("# xx:%e Pk_gg:%e Pk_gd:%e Pgg1hcs:%e Pgg1hss:%e Pgg2hcc:%e Pgg2hcs:%e Pgg2hss:%e fcen:%e fsat:%e \n",xx[kk],Pk_gg[kk],Pk_gd[kk],P_gg_1hcs,P_gg_1hss,P_gg_2hcc,P_gg_2hcs,P_gg_2hss,fcen,fsat);
+            //printf("# xx:%e Pk_gg:%e Pk_gd:%e Pgg1hcs:%e Pgg1hss:%e Pgg2hcc:%e Pgg2hcs:%e Pgg2hss:%e fcen:%e fsat:%e \n",xx[kk],Pk_gg[kk],Pk_gd[kk],P_gg_1hcs,P_gg_1hss,P_gg_2hcc,P_gg_2hcs,P_gg_2hss,fcen,fsat);
+            printf("# xx:%e Pk_gg:%e Pk_gd:%e Pgg2hcc:%e fcen:%e \n",xx[kk],Pk_gg[kk],Pk_gd[kk],P_gg_2hcc,fcen);//rs
             print();
 	    continue;
             if(Pk_gg[kk]<0){
@@ -782,7 +806,7 @@ double hod::Pk_gg_gd(double z)
     std::cout<<"# Calling Pk_gg_gd\n";
     }
 
-    // Sanity check 
+    // Sanity check
     if(fcen_off!=0.0||off_rbyrs!=0.0){
         std::cout<<"The offset central case is not handled while the halo exclusion is not on. Please enable halo exclusion"<<std::endl;
         std::cout<<"I am going to abort execution inside Pk_gg_gd"<<std::endl;
@@ -799,12 +823,13 @@ double hod::Pk_gg_gd(double z)
         karr[i]=pow(10.,karr[i]);
     }
 
-    // First the various denominators. 
+    // First the various denominators.
     //  The rho is in comoving units, so no z dependence.
     double rho_aver=Omega0*rho_crit_0;
-    
+
     // Set up the mass dependent factors in the integral
-    double mdep_1hcs[N9_16],mdep_1hss[N9_16],mdep_1hcd[N9_16],mdep_1hsd[N9_16],mdep_2hs[N9_16],mdep_2hd[N9_16];
+    //double mdep_1hcs[N9_16],mdep_1hss[N9_16],mdep_1hcd[N9_16],mdep_1hsd[N9_16],mdep_2hs[N9_16],mdep_2hd[N9_16];
+    double mdep_1hcd[N9_16],mdep_2hd[N9_16];//rs
     double rvir[N9_16],mvir[N9_16],cvir[N9_16];
     double r200[N9_16],c200[N9_16];
 
@@ -815,25 +840,25 @@ double hod::Pk_gg_gd(double z)
     double mdep_2hcorr=0.0;
 
     double totNc=0.0;
-    double totNs=0.0;
+    //double totNs=0.0;
     double btot=0.0;
     for(int i=0;i<N9_16;i++)
     {
 	// Numerator HOD factors
 	double mass=pow(10.,x9_16[i]);
 	double avNcen=ncen(x9_16[i]);
-	double avNsat=nsat(x9_16[i]);
+	//double avNsat=nsat(x9_16[i]);
 	double nofmdm=nofm(mass,z)*w9_16[i]*mass*log(10.0);
 	double bmnmdm=bias(mass,z)*nofm(mass,z)*w9_16[i]*mass*log(10.0);
 	modelNFWhalo_com(mass, z, mvir[i], rvir[i], cvir[i], r200[i],c200[i]);
 
 	// M dependent terms that need a kterm multiplication
-	mdep_1hcs[i]=avNcen*avNsat*nofmdm;
-	mdep_1hss[i]=avNsat*avNsat*nofmdm;
+	//mdep_1hcs[i]=avNcen*avNsat*nofmdm;
+	//mdep_1hss[i]=avNsat*avNsat*nofmdm;
 	mdep_1hcd[i]=avNcen* mass *nofmdm/rho_aver;
-	mdep_1hsd[i]=avNsat* mass *nofmdm/rho_aver;
+	//mdep_1hsd[i]=avNsat* mass *nofmdm/rho_aver;
 
-	mdep_2hs[i] =avNsat*bmnmdm;
+	//mdep_2hs[i] =avNsat*bmnmdm;
 	mdep_2hd[i] = mass *bmnmdm/rho_aver;
 
 	// M dependent terms that are k-independent
@@ -841,32 +866,35 @@ double hod::Pk_gg_gd(double z)
 	mdep_2hcorr=mdep_2hcorr+mass*bmnmdm/rho_aver;
 
         totNc=totNc+avNcen*nofmdm;
-        totNs=totNs+avNsat*nofmdm;
+        //totNs=totNs+avNsat*nofmdm;
 
-        btot=btot+(avNcen+avNsat)*bmnmdm;
+        //btot=btot+(avNcen+avNsat)*bmnmdm;
+        btot=btot+(avNcen)*bmnmdm;//rs
 
     }
 
     mdep_2hcorr=1.0-mdep_2hcorr;
-    btot=btot/(totNc+totNs);
+    //btot=btot/(totNc+totNs);
+    btot=btot/(totNc);//rs
 
     //std::cout<<"Nc Ns:"<<totNc<<" "<<totNs<<std::endl;
 
     // Central satellite fractions
-    double fcen=totNc/(totNc+totNs);
-    double fsat=1.-fcen;
+    //double fcen=totNc/(totNc+totNs);
+    double fcen=totNc/(totNc);//rs
+    //double fsat=1.-fcen;
 
     /// Set the Kaiser factor
     fKaiser=-dlnDdln1pz(z)/btot;
 
     for(int i=0;i<N9_16;i++)
     {
-	mdep_1hcs[i]=mdep_1hcs[i]/totNc/totNs;
-	mdep_1hss[i]=mdep_1hss[i]/totNs/totNs;
+	//mdep_1hcs[i]=mdep_1hcs[i]/totNc/totNs;
+	//mdep_1hss[i]=mdep_1hss[i]/totNs/totNs;
 	mdep_1hcd[i]=mdep_1hcd[i]/totNc;
-	mdep_1hsd[i]=mdep_1hsd[i]/totNs;
-                                 
-	mdep_2hs[i] =mdep_2hs[i]/totNs;
+	//mdep_1hsd[i]=mdep_1hsd[i]/totNs;
+
+	//mdep_2hs[i] =mdep_2hs[i]/totNs;
 
     }
     mdep_2hc=mdep_2hc/totNc;
@@ -874,8 +902,10 @@ double hod::Pk_gg_gd(double z)
     // k and M dependent parts
     for(int k=0;k<kbins;k++)
     {
-	double int_1hcs,int_1hss,int_1hcd,int_1hsd,int_2hs,int_2hd;
-	int_1hcs=int_1hss=int_1hcd=int_1hsd=int_2hs=int_2hd=0.0;
+	//double int_1hcs,int_1hss,int_1hcd,int_1hsd,int_2hs,int_2hd;
+	double int_1hcd,int_2hd;//rs
+	//int_1hcs=int_1hss=int_1hcd=int_1hsd=int_2hs=int_2hd=0.0;
+	int_1hcd=int_2hd=0.0;//rs
 	for(int i=0;i<N9_16;i++)
 	{
 	    double uk_s,uk_d;
@@ -887,11 +917,11 @@ double hod::Pk_gg_gd(double z)
 	    }
 
 	    // Now the integrals
-	    int_1hcs+=mdep_1hcs[i]*uk_s;
-	    int_1hss+=mdep_1hss[i]*pow(uk_s,2.);
+	    //int_1hcs+=mdep_1hcs[i]*uk_s;
+	    //int_1hss+=mdep_1hss[i]*pow(uk_s,2.);
 	    int_1hcd+=mdep_1hcd[i]*uk_d;
-	    int_1hsd+=mdep_1hsd[i]*uk_s*uk_d;
-	    int_2hs +=mdep_2hs[i] *uk_s;
+	    //int_1hsd+=mdep_1hsd[i]*uk_s*uk_d;
+	    //int_2hs +=mdep_2hs[i] *uk_s;
 	    int_2hd +=mdep_2hd[i] *uk_d;
 
 	    //std::cout<<std::scientific;
@@ -903,20 +933,22 @@ double hod::Pk_gg_gd(double z)
 	double kfac=pow(karr[k],3.)/(2.0*M_PI*M_PI);
 	double pofk=Delta2_L_num(karr[k],z)/kfac;
 
-	double P_gg_1hcs=int_1hcs;
-	double P_gg_1hss=int_1hss;
+	//double P_gg_1hcs=int_1hcs;
+	//double P_gg_1hss=int_1hss;
 	double P_gg_2hcc=mdep_2hc*mdep_2hc*pofk;
-	double P_gg_2hcs=mdep_2hc* int_2hs*pofk;
-	double P_gg_2hss=int_2hs * int_2hs*pofk;
+	//double P_gg_2hcs=mdep_2hc* int_2hs*pofk;
+	//double P_gg_2hss=int_2hs * int_2hs*pofk;
 
 	double P_gd_1hc =int_1hcd;
-	double P_gd_1hs =int_1hsd;
-	double P_gd_2hc =mdep_2hc*(int_2hd+mdep_2hcorr)*pofk; 
-	double P_gd_2hs =int_2hs *(int_2hd+mdep_2hcorr)*pofk; 
+	//double P_gd_1hs =int_1hsd;
+	double P_gd_2hc =mdep_2hc*(int_2hd+mdep_2hcorr)*pofk;
+	//double P_gd_2hs =int_2hs *(int_2hd+mdep_2hcorr)*pofk;
 
 	// Total gg and gd power spectra
-	Pk_gg[k]=2.0*fcen*fsat*P_gg_1hcs+fsat*fsat*P_gg_1hss+fcen*fcen*P_gg_2hcc+2.0*fcen*fsat*P_gg_2hcs+fsat*fsat*P_gg_2hss;
-	Pk_gd[k]=fcen*P_gd_1hc+fsat*P_gd_1hs+fcen*P_gd_2hc+fsat*P_gd_2hs;
+	//Pk_gg[k]=2.0*fcen*fsat*P_gg_1hcs+fsat*fsat*P_gg_1hss+fcen*fcen*P_gg_2hcc+2.0*fcen*fsat*P_gg_2hcs+fsat*fsat*P_gg_2hss;
+	//Pk_gd[k]=fcen*P_gd_1hc+fsat*P_gd_1hs+fcen*P_gd_2hc+fsat*P_gd_2hs;
+	Pk_gg[k] = P_gg_2hcc;
+	Pk_gd[k]=P_gd_1hc+P_gd_2hc;
 
 	if(Pk_gg[k]<=0||Pk_gd[k]<=0){
 	    std::cout<<"Power spectra negative, please debug"<<std::endl;
@@ -1084,7 +1116,7 @@ double hod::xi_gg_gd(double z)
     if(verbose){
         std::cout<<"# Calling xi_gg_gd\n";
     }
-    // Define rbins 
+    // Define rbins
     // 240 req accuracy 1e-3 in projection integral
     // 80 req accuracy 1e-3 in projection integral
     static const int rbins=40;
@@ -1132,10 +1164,10 @@ double hod::xi_gg_gd(double z)
         int status=0;
 
         if(!mock){
-            status=gsl_integration_qawf (&F, 1.E-30, 1.e-3, 1000, w, cw, qt, &result, &error); 
+            status=gsl_integration_qawf (&F, 1.E-30, 1.e-3, 1000, w, cw, qt, &result, &error);
         }else{
-            //    status=gsl_integration_qawf (&F, 4.35E-2*rarr[i], 1.e-3, 1000, w, cw, qt, &result, &error); 
-            status=gsl_integration_qawf (&F, 4.35E-2*rarr[i]/4., 1.e-3, 1000, w, cw, qt, &result, &error); 
+            //    status=gsl_integration_qawf (&F, 4.35E-2*rarr[i], 1.e-3, 1000, w, cw, qt, &result, &error);
+            status=gsl_integration_qawf (&F, 4.35E-2*rarr[i]/4., 1.e-3, 1000, w, cw, qt, &result, &error);
         }
         gsl_set_error_handler(oldhand);
         if(status!=0 && verbose){
@@ -1189,10 +1221,10 @@ double hod::xi_gg_gd(double z)
         int status=0;
 
         if(!mock){
-            gsl_integration_qawf (&F, 1.E-30, 1.e-3, 1000, w, cw, qt, &result, &error); 
+            gsl_integration_qawf (&F, 1.E-30, 1.e-3, 1000, w, cw, qt, &result, &error);
         }else{
-            //gsl_integration_qawf (&F, 4.35E-2*rarr[i], 1.e-3, 1000, w, cw, qt, &result, &error); 
-            gsl_integration_qawf (&F, 4.35E-2*rarr[i]/4., 1.e-3, 1000, w, cw, qt, &result, &error); 
+            //gsl_integration_qawf (&F, 4.35E-2*rarr[i], 1.e-3, 1000, w, cw, qt, &result, &error);
+            gsl_integration_qawf (&F, 4.35E-2*rarr[i]/4., 1.e-3, 1000, w, cw, qt, &result, &error);
         }
         gsl_set_error_handler(oldhand);
         if(status!=0 && verbose){
@@ -1235,7 +1267,7 @@ double hod::xi_gd(double z)
     if(verbose){
         std::cout<<"# Calling xi_gd\n";
     }
-    // Define rbins 
+    // Define rbins
     // 240 req accuracy 1e-3 in projection integral
     // 80 req accuracy 1e-3 in projection integral
     static const int rbins=40;
@@ -1287,10 +1319,10 @@ double hod::xi_gd(double z)
         int status=0;
 
         if(!mock){
-            status=gsl_integration_qawf (&F, 1.E-30, 1.e-3, 1000, w, cw, qt, &result, &error); 
+            status=gsl_integration_qawf (&F, 1.E-30, 1.e-3, 1000, w, cw, qt, &result, &error);
         }else{
-            //status=gsl_integration_qawf (&F, 4.35E-2*rarr[i], 1.e-3, 1000, w, cw, qt, &result, &error); 
-            status=gsl_integration_qawf (&F, 4.35E-2*rarr[i]/4., 1.e-3, 1000, w, cw, qt, &result, &error); 
+            //status=gsl_integration_qawf (&F, 4.35E-2*rarr[i], 1.e-3, 1000, w, cw, qt, &result, &error);
+            status=gsl_integration_qawf (&F, 4.35E-2*rarr[i]/4., 1.e-3, 1000, w, cw, qt, &result, &error);
         }
         gsl_set_error_handler(oldhand);
         if(status!=0 && verbose){
@@ -1334,7 +1366,7 @@ double hod::xi_gg(double z)
     if(verbose){
         std::cout<<"# Calling xi_gg\n";
     }
-    // Define rbins 
+    // Define rbins
     // 240 req accuracy 1e-3 in projection integral
     // 80 req accuracy 1e-3 in projection integral
     static const int rbins=240;
@@ -1384,10 +1416,10 @@ double hod::xi_gg(double z)
 
         int status=0;
         if(!mock){
-            status=gsl_integration_qawf (&F, 1.0E-30, 1.e-3, 1000, w, cw, qt, &result, &error); 
+            status=gsl_integration_qawf (&F, 1.0E-30, 1.e-3, 1000, w, cw, qt, &result, &error);
         }else{
-            //status=gsl_integration_qawf (&F, 4.35E-2*rarr[i], 1.e-3, 1000, w, cw, qt, &result, &error); 
-            status=gsl_integration_qawf (&F, 4.35E-2*rarr[i]/4., 1.e-3, 1000, w, cw, qt, &result, &error); 
+            //status=gsl_integration_qawf (&F, 4.35E-2*rarr[i], 1.e-3, 1000, w, cw, qt, &result, &error);
+            status=gsl_integration_qawf (&F, 4.35E-2*rarr[i]/4., 1.e-3, 1000, w, cw, qt, &result, &error);
         }
         gsl_set_error_handler(oldhand);
         if(status!=0 && verbose){
@@ -2001,23 +2033,27 @@ void hod::hod_free()
 
 void hod::print(cosmo p, hodpars h)
 {
-    printf(" %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg \n", p.Om0, p.Omk, p.w0, p.wa, p.s8, p.nspec, p.Omb, p.hval, p.ximax, p.cfac, h.Mmin, h.siglogM, h.Msat, h.alpsat, h.Mcut, h.csbycdm, h.fac );
+    //printf(" %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg \n", p.Om0, p.Omk, p.w0, p.wa, p.s8, p.nspec, p.Omb, p.hval, p.ximax, p.cfac, h.Mmin, h.siglogM, h.Msat, h.alpsat, h.Mcut, h.csbycdm, h.fac );
+    printf(" %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg \n", p.Om0, p.Omk, p.w0, p.wa, p.s8, p.nspec, p.Omb, p.hval, p.ximax, p.cfac, h.Mmin, h.siglogM, h.csbycdm, h.fac );
 }
 
 void hod::print(FILE *&fp, cosmo p, hodpars h)
 {
-    fprintf(fp,"%lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg \n", p.Om0, p.s8, p.nspec, p.Omb, p.hval, p.ximax, p.cfac, h.Mmin, h.siglogM, h.Msat, h.alpsat, h.Mcut, h.csbycdm, h.fac);
+    //fprintf(fp,"%lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg \n", p.Om0, p.s8, p.nspec, p.Omb, p.hval, p.ximax, p.cfac, h.Mmin, h.siglogM, h.Msat, h.alpsat, h.Mcut, h.csbycdm, h.fac);
+    fprintf(fp,"%lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg \n", p.Om0, p.s8, p.nspec, p.Omb, p.hval, p.ximax, p.cfac, h.Mmin, h.siglogM, h.csbycdm, h.fac);
 }
 
 void hod::print(FILE *&fp, cosmo p, hodpars h, double facc, double c2)
 {
-    fprintf(fp," %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg \n", p.Om0, p.Omk, p.w0, p.wa, p.s8, p.nspec, p.Omb, p.hval, p.ximax, p.cfac, h.Mmin, h.siglogM, h.Msat, h.alpsat, h.Mcut, h.csbycdm, h.fac, facc, c2);
+    //fprintf(fp," %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg \n", p.Om0, p.Omk, p.w0, p.wa, p.s8, p.nspec, p.Omb, p.hval, p.ximax, p.cfac, h.Mmin, h.siglogM, h.Msat, h.alpsat, h.Mcut, h.csbycdm, h.fac, facc, c2);
+    fprintf(fp," %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg \n", p.Om0, p.Omk, p.w0, p.wa, p.s8, p.nspec, p.Omb, p.hval, p.ximax, p.cfac, h.Mmin, h.siglogM, h.csbycdm, h.fac, facc, c2);
 }
 
 void hod::print()
 {
     //printf("# %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg %lg \n", Omega0, Omegal, w0, wa, sigma8, ns, Omegab, h, xiNLzetamax, cfactor, hodp.Mmin, hodp.siglogM, hodp.Msat, hodp.alpsat, hodp.Mcut, hodp.csbycdm, hodp.fac );
-    printf("# %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg \n", Omega0, Omegal, w0, wa, sigma8, ns, Omegab, h, xiNLzetamax, cfactor, hodp.Mmin, hodp.siglogM, hodp.Msat, hodp.alpsat, hodp.Mcut, hodp.csbycdm, hodp.fac,off_rbyrs,fcen_off,inc_alp,inc_xM);
+    //printf("# %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg \n", Omega0, Omegal, w0, wa, sigma8, ns, Omegab, h, xiNLzetamax, cfactor, hodp.Mmin, hodp.siglogM, hodp.Msat, hodp.alpsat, hodp.Mcut, hodp.csbycdm, hodp.fac,off_rbyrs,fcen_off,inc_alp,inc_xM);
+    printf("# %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg %.8lg \n", Omega0, Omegal, w0, wa, sigma8, ns, Omegab, h, xiNLzetamax, cfactor, hodp.Mmin, hodp.siglogM, hodp.csbycdm, hodp.fac,off_rbyrs,fcen_off,inc_alp,inc_xM);
 }
 
 /*
@@ -2316,7 +2352,7 @@ double hod::pspec_halomodel(double z){
         karr[i]=pow(10.,karr[i]);
     }
 
-    // First the various denominators. 
+    // First the various denominators.
     //  The rho is in comoving units, so no z dependence.
     double rho_aver=Omega0*rho_crit_0;
 
@@ -2443,8 +2479,10 @@ double hod::avmass_tot(double z){
     {
         double m=pow(10.,x9_16[i]);
         double tmp_m=pow(10.,x9_16[i]-12.0);
-        avMass_d=avMass_d+log(10.0)*(ncen(x9_16[i])+nsat(x9_16[i]))*m*nofm(m,z)*w9_16[i];
-        avMasst_n=avMasst_n+tmp_m*log(10.0)*(ncen(x9_16[i])+nsat(x9_16[i]))*m*nofm(m,z)*w9_16[i];
+        //avMass_d=avMass_d+log(10.0)*(ncen(x9_16[i])+nsat(x9_16[i]))*m*nofm(m,z)*w9_16[i];
+        //avMasst_n=avMasst_n+tmp_m*log(10.0)*(ncen(x9_16[i])+nsat(x9_16[i]))*m*nofm(m,z)*w9_16[i];
+        avMass_d=avMass_d+log(10.0)*(ncen(x9_16[i]))*m*nofm(m,z)*w9_16[i];//rs
+        avMasst_n=avMasst_n+tmp_m*log(10.0)*(ncen(x9_16[i]))*m*nofm(m,z)*w9_16[i];//rs
     }
     return avMasst_n/avMass_d;
 }
@@ -2478,7 +2516,6 @@ double hod::scale_dep_bias_crossr(double z, int rbins, double rr[], double bias[
         bias[i]=pow(xigg/ximm,0.5);
         crossr[i]=xigd/pow(ximm*xigg,0.5);
     }
-    
+
     return 0;
 }
-
